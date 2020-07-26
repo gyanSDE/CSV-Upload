@@ -6,6 +6,8 @@ app.use('/',require('./routes'));
 app.set('view engine','ejs');
 app.set('views','./views');
 
+const db = require('./config/mongoose');
+
 app.listen(port,(err)=>{
     if(err){
         console.log(`Error: ${err}`);
