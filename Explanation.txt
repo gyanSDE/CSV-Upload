@@ -1,0 +1,187 @@
+1.inside Test03 Create a folder uploads and aslo a folder csv inside it (Here we will store all the uploaded csv files inside it)
+
+2.we will create a models folder and csvFile.js inside it and we will create a schema inside it and also write some codes for storing tha using multer
+
+models[csvFile.js]
+
+const mongoose = require('mongoose');
+const multer = require('multer');
+const path = require('path');
+
+
+const CSV_PATH = path.join('/uploads/csv');
+const csvSchema = new mongoose.Schema({
+    fileName: {
+        type: String,
+        required: true,
+    },
+    fileUrl: {
+        type: String,
+        required: true
+     }//,
+    // csv:{
+    //     type: String
+      
+    // }
+}, {
+    timestamps: true
+}
+);
+
+let storage = multer.diskStorage({
+    destination: function (req, file , cb ) {
+      cb(null  , path.join(__dirname,'..',CSV_PATH));  
+    },
+    filename: function (req, file, cb ) {
+         cb(null, file.fieldname + '-' + Date.now());
+        //cb(null, req.body.filename);
+    }
+  });
+
+  csvSchema.statics.uploadedCsv = multer({ storage: storage }).single('csv');
+
+  csvSchema.statics.csvPath = CSV_PATH;
+
+const Csv = mongoose.model('Csv' , csvSchema);
+
+module.exports = Csv;
+
+3. We will use this now from the controller i.e. controllers[home_controller.js]
+
+const Csv = require("../models/csvFile");
+
+module.exports.uploadCsv = (req, res) => {
+    console.log(req.file);
+    Csv.uploadedCsv(req, res, function (err) {
+        if (err) {
+            console.log('multer error', err);
+        }
+        if (req.file) {
+            Csv.create({
+                fileName: req.body.filename,
+                fileUrl: Csv.csvPath + '/' + req.file.filename
+            });
+        }
+        console.log(req.body);
+        console.log(req.file);
+    })
+    // Csv.create({
+    //     fileName: req.body.fileame,
+    //     fileUrl: req.file.path,
+    //   });
+    return res.redirect('back');
+};
+
+4. The views files which will trigger this action will be
+views[home.ejs]
+
+
+        <form action="/upload-csv" method="POST" enctype="multipart/form-data">
+            <div class = "row">
+                <input class="form-control my-4 col" type="text" name="filename" placeholder="Enter filename" required />
+                <input class="form-control my-4 col-4" type="file" name="csv" accept=".csv, application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel"  required />
+            </div>
+          
+          <div class="text-center">
+            <button class="btn btn-info btn-lg" type="submit">Submit</button>
+          </div>
+        </form>
+
+
+HOW IT WILL WORK? WE WILL SEE HOW THE CONTROL WILL MOVE FROM VIEWS TO STORING THE DATA 
+
+(i) When on views we click on submit button after fatching the file and filename on the views
+(ii) The control goes to "/upload-csv" route i.e 
+routes[index.js] 
+
+router.post('/upload-csv' , homeController.uploadCsv);
+
+(iii) It will trigger the action to the homeController.uploadCsv which means the uploadsCsv function in home controller will gets executed
+
+const Csv = require("../models/csvFile");
+
+
+module.exports.uploadCsv = (req, res) => {
+    //console.log(req.file);
+    Csv.uploadedCsv(req, res, function (err) {
+        if (err) {
+            console.log('multer error', err);
+        }
+        if (req.file) {
+            Csv.create({
+                fileName: req.body.filename,
+                fileUrl: Csv.csvPath + '/' + req.file.filename
+            });
+        }
+        //console.log(req.body);
+        //console.log(req.file);
+    })
+    // Csv.create({
+    //     fileName: req.body.fileame,
+    //     fileUrl: req.file.path,
+    //   });
+    return res.redirect('back');
+};
+
+This function will executed below line means it will go to  Csv.uploadedCsv(req, res, function (err) {  
+    which means it will go to
+../models/csvFile                           folder from here and trigger 
+csvSchema.statics.uploadedCsv = multer({ storage: storage }).single('csv');         this inside that file . The csv in single('csv') is the same name present thside te views of input tag
+
+
+(iv) In the above uploadCsv => storage: storage will trigger the storage just above it i.e. below written lines on code
+
+
+const CSV_PATH = path.join('/uploads/csv');
+
+
+let storage = multer.diskStorage({
+    destination: function (req, file , cb ) {
+      cb(null  , path.join(__dirname,'..',CSV_PATH));  
+    },
+    filename: function (req, file, cb ) {
+         cb(null, file.fieldname + '-' + Date.now());
+        //cb(null, req.body.filename);
+    }
+  });
+
+  It will set the destination and the filename 
+
+(v)THese lines of code from point (iii) will gets executed after that setting destination and filename
+
+
+if (err) {
+            console.log('multer error', err);
+        }
+        if (req.file) {
+            Csv.create({
+                fileName: req.body.filename,
+                fileUrl: Csv.csvPath + '/' + req.file.filename
+            });
+        }
+        //console.log(req.body);
+        //console.log(req.file);
+    })
+    return res.redirect('back');
+
+Csv file will be created at the destination and in the db it will fill the fileName and fileUrl fields With the strings aspassed above
+
+
+
+
+
+NOTE:: THe multipart form gives req.body and req.files both But For accessing the req.file we need to pass it throught the multer i.e.
+
+models[csvFile.js]
+
+let storage = multer.diskStorage({
+    destination: function (req, file , cb ) {
+      cb(null  , path.join(__dirname,'..',CSV_PATH));  
+    },
+    filename: function (req, file, cb ) {
+         cb(null, file.fieldname + '-' + Date.now());
+        //cb(null, req.body.filename);
+    }
+  });
+
+  csvSchema.statics.uploadedCsv = multer({ storage: storage }).single('csv');
