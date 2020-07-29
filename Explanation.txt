@@ -1,3 +1,6 @@
+sudo systemctl start mongod
+
+
 1.inside Test03 Create a folder uploads and aslo a folder csv inside it (Here we will store all the uploaded csv files inside it)
 
 2.we will create a models folder and csvFile.js inside it and we will create a schema inside it and also write some codes for storing tha using multer
