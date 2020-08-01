@@ -28,6 +28,8 @@ module.exports.uploadCsv = async (req, res) => {
 };
 
 module.exports.viewCsv = async (req, res) => {
+    //console.log(req._parsedUrl.query);
+    //console.log(req.params.id);
     let data = await Csv.findById(req.params.id)
     const csvFilePath = path.join(__dirname, '..', data.fileUrl);
     //const csv=require('csvtojson')
@@ -46,16 +48,18 @@ module.exports.viewCsv = async (req, res) => {
       keys.push(k);
       
     }
-
+var idNum= req._parsedUrl.query;
    // console.log(keys);
 
     return res.render('viewCsv', {
         title: "CSV | View",
         details: jsonArray,
         keys:keys,
-        fileName:data.fileName
+        fileName:data.fileName,
+        idNum,
+        idVal:data
     });
 
 
-    return res.redirect('/');
-};
+//return res.redirect('/');
+}; 
