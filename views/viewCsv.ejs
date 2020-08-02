@@ -10,11 +10,14 @@
 
 <body>
   <div class="container">
-    <a href="/home"><h1 class="display-1 text-center">CSV Upload</h1></a>
-    
+    <a href="/home">
+      <h1 class="display-1 text-center">CSV Upload</h1>
+    </a>
+
     <!-- Form to get a new csv file -->
     <h1 class="text-center my-4 display-4">Name : <%=fileName%></h1>
-    <input class="form-control my-4 col" type="text" name="search" id="search" placeholder="Search" required />
+    <input class="form-control my-4 col" type="text" name="search" id="search" placeholder="Press Enter To Search"
+      required />
     <table class="table text-center table-striped my-1 mb-3" id="table">
       <%
         details.sort(function(a, b){
@@ -34,17 +37,48 @@
       </tr>
       
       <!-- Iterating over the avaiable csv data and printing them  -->
-      <%for(let i= 0 ; i < details.length ; i++){%>                    
-        <tr class='items'>     
-             <%for(let k of keys){%>     
-                <td><%=details[i][k]%> </td>
-            <%}%>         
+      <%for(let i= 0 ; i < details.length ; i++){%>
+      <tr class='items'>
+        <%for(let k of keys){%>
+        <td><%=details[i][k]%> </td>
+        <%}%>         
         </tr>             
       <%}%>
     </table>
-    
-    <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
-    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
-  </body>
+
+    <script>
+      var searchBox = document.getElementById("search");
+      searchBox.addEventListener('keyup', async (event) => {
+
+        if (event.keyCode == 13) {
+          const str = searchBox.value;
+          for (var i = 0; i < document.getElementsByClassName("items").length; i++) {
+            var x = document.getElementsByClassName("items")[i];
+            x.hidden = false;
+            var count = 0;
+            for (var j = 0; j < document.getElementsByClassName("items")[i].cells.length; j++) {
+              if (document.getElementsByClassName("items")[i].cells[j].innerText === str) {
+                count = 1;
+                break;
+              }
+            }
+            if (count == 0 && str != "") {
+              x.hidden = true;
+            }
+          }
+        }
+      });
+    </script>
+
+    <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js"
+      integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN"
+      crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js"
+      integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q"
+      crossorigin="anonymous"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"
+      integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl"
+      crossorigin="anonymous"></script>
+</body>
+
 </html>
