@@ -17,7 +17,7 @@ module.exports.uploadCsv = async (req, res) => {
             console.log('multer error', err);
         }
         if (req.file) {
-            Csv.create({
+            await Csv.create({
                 fileName: req.body.filename,
                 fileUrl: Csv.csvPath + '/' + req.file.filename
                 //fileUrl: req.file.filename
